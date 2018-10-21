@@ -1,0 +1,120 @@
+---
+spring:
+  profiles: routes
+  cloud:
+    gateway:
+      routes:
+      # RabbitMQ Websocket route
+      - id: websocket_route
+        #uri: ws://192.168.1.190:15674
+        uri: ws://${mq.host}:15674
+        predicates:
+        - Path=/ws/**      
+      ##############################################
+      #             业务管理平台管理                            #
+      ##############################################        
+      # == 管理接口-字典管理接口服务 ==
+      - id: system_dict
+        uri: http://localhost:8002
+        order: 9000
+        predicates:
+        - Path=/platform/api/system/dict/**
+        filters:
+        - RewritePath=/.*/api/system/dict/(?<segment>.*), /$\{segment}
+        - JwtParser
+      # == 管理接口-系统管理默认接口服务（naf_user）==
+      - id: system_default
+        uri: http://localhost:8001
+        order: 9100
+        predicates:
+        - Path=/platform/api/system/**
+        filters:
+        - RewritePath=/.*/api/system/(?<segment>.*), /$\{segment}
+        - JwtParser=.*/login
+      # == 内部接口-微信扫码登录（naf_weixin）==
+      - id: internal_weixin
+        uri: http://localhost:8001
+        order: 9100
+        predicates:
+        - RemoteAddr=192.168.1.1/16, 127.0.0.1/32
+        - Path=/platform/api/weixin/**
+        filters:
+        - RewritePath=/.*/weixin/(?<segment>.*), /weixin/$\{segment}
+      # == 公共接口-NAF字典接口服务 ==
+      - id: api_naf_dict
+        uri: http://localhost:8002
+        order: 9000
+        predicates:
+        - Path=/platform/api/naf/dict/**
+        filters:
+        - RewritePath=/.*/api/naf/dict/(?<segment>.*), /api/$\{segment}
+      # == 公共接口-NAF用户相关接口服务（naf_user）==
+      - id: api_naf_default
+        uri: http://localhost:8001
+        order: 9200
+        predicates:
+        - Path=/platform/api/naf/**
+        filters:
+        - RewritePath=/.*/api/naf/(?<segment>.*), /api/$\{segment}
+      # == 管理平台微信扫码登录 ==
+      - id: platform_weixin
+        uri: http://localhost:3300
+        order: 9900
+        predicates:
+        - Path=/platform/weixin/**
+        filters:
+        - AddRequestHeader=X-Tenant, master
+      # == 省级平台管理前端 ==
+      - id: master_platform_admin
+        uri: http://localhost:3100
+        order: 10000
+        predicates:
+        - Path=/platform/**
+        - Host=smart.**
+        filters:
+        - AddRequestHeader=X-Tenant, master
+      # == 二级多租户平台管理前端 ==
+      - id: master_platform_admin
+        uri: http://localhost:3100
+        order: 10000
+        predicates:
+        - Host=*.smart.**
+        - Path=/platform/**
+        filters:
+        - HostToTenant=^([0-9]{5}).smart.*
+      ##############################################
+      #                  前端接口                                 #
+      ##############################################        
+      # == 框架接口-NAF字典接口服务 ==
+      - id: naf_code
+        uri: http://localhost:8002
+        order: 9000
+        predicates:
+        - Path=/www/api/naf/code/**
+        filters:
+        - RewritePath=/www/api/naf/code/(?<segment>.*), /api/$\{segment}
+      # == 平台接口-学生库接口服务 ==
+      - id: platform_user
+        uri: http://localhost:8101
+        order: 9000
+        predicates:
+        - Path=/www/api/user/**
+        filters:
+        - RewritePath=/www/api/user/(?<segment>.*), /api/$\{segment}
+      # == 平台接口-企业库接口服务 ==
+      - id: platform_corp
+        uri: http://localhost:8102
+        order: 9000
+        predicates:
+        - Path=/www/api/corp/**
+        filters:
+        - RewritePath=/www/api/corp/(?<segment>.*), /api/$\{segment}
+      # == 业务接口-招聘系统接口服务 ==
+      - id: platform_user
+        uri: http://localhost:8201
+        order: 9000
+        predicates:
+        - Path=/www/api/jobs/**
+        filters:
+        - RewritePath=/www/api/jobs/(?<segment>.*), /api/$\{segment}
+        

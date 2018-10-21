@@ -4,7 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
+import naf.cloud.gateway.filter.factory.HostToTenantGatewayFilterFactory;
+import naf.cloud.gateway.filter.factory.JwtParserGatewayFilterFactory;
 import naf.cloud.gateway.filter.factory.SetRequestHeaderExGatewayFilterFactory;
 
 @SpringBootApplication
@@ -26,7 +29,20 @@ public class NafGatewayApplication {
 		return new SetRequestHeaderExGatewayFilterFactory();
 	}
 
+	@Bean
+	@Order(-1)
+	public JwtParserGatewayFilterFactory jwtParserGatewayFilterFactory() {
+		return new JwtParserGatewayFilterFactory();
+	}
+
+	@Bean
+	@Order(-2)
+	public HostToTenantGatewayFilterFactory hostToTenantGatewayFilterFactory() {
+		return new HostToTenantGatewayFilterFactory();
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(NafGatewayApplication.class, args);
+		JwtParserGatewayFilterFactory.doInit();
 	}
 }

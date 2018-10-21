@@ -5,58 +5,37 @@ test:
   uri: lb://httpbin
 
 server.port: 8000
+jwt.secret: "Ziyouyanfa!@#"
   
+---
 spring:
+  profiles: dev
+  profiles.include: routes
   cloud:
     gateway:
       default-filters:
       #- PrefixPath=/httpbin
-      - AddResponseHeader=X-Response-Default-Foo, Default-Bar
+      #- JwtParser=.*/login
+      - AddResponseHeader=Cache-Control, no-cache
+      - AddResponseHeader=Pragma, no-cache
+      - AddResponseHeader=Expires, -1
+mq.host: 127.0.0.1       
+        
+logging.level.naf.cloud.gateway.*: DEBUG
 
-      routes:
-      # == 管理接口-字典管理接口服务 ==
-      - id: system_dict
-        uri: http://localhost:8002
-        order: 9000
-        predicates:
-        - Path=/{tenant}/api/system/dict/**
-        filters:
-        - SetRequestHeaderEx=X-Tenant, {tenant}
-        - RewritePath=/[^/]+/api/system/dict/(?<segment>.*), /$\{segment}
-      # == 管理接口-系统管理默认接口服务（naf_user）==
-      - id: system_default
-        uri: http://localhost:8001
-        order: 9100
-        predicates:
-        - Path=/{tenant}/api/system/**
-        filters:
-        - SetRequestHeaderEx=X-Tenant, {tenant}
-        - RewritePath=/[^/]+/api/system/(?<segment>.*), /$\{segment}
-      # == 公共接口-NAF字典接口服务 ==
-      - id: api_naf_dict
-        uri: http://localhost:8002
-        order: 9000
-        predicates:
-        - Path=/public/api/naf/dict/**
-        filters:
-        - RewritePath=/public/api/naf/dict/(?<segment>.*), /api/$\{segment}
-      # == 公共接口-NAF用户相关接口服务（naf_user）==
-      - id: api_naf_default
-        uri: http://localhost:8001
-        order: 10000
-        predicates:
-        - Path=/public/api/naf/**
-        filters:
-        - RewritePath=/public/api/naf/(?<segment>.*), /api/$\{segment}
-      # == 省级平台管理前端 ==
-      - id: master_site_admin
-        uri: http://localhost:3100
-        order: 10000
-        predicates:
-        - Path=/master/**
-      # == 二级多租户平台管理前端 ==
-      - id: school_site_admin
-        uri: http://localhost:3200
-        order: 10000
-        predicates:
-        - Path=/school/**
+---
+spring:
+  profiles: prod
+  profiles.include: routes
+  cloud:
+    gateway:
+      default-filters:
+      #- PrefixPath=/httpbin
+      #- JwtParser=.*/login
+      - AddResponseHeader=Cache-Control, no-cache
+      - AddResponseHeader=Pragma, no-cache
+      - AddResponseHeader=Expires, -1
+mq.host: 192.168.1.190       
+
+
+        
