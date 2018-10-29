@@ -20,6 +20,7 @@ spring:
       - AddResponseHeader=Pragma, no-cache
       - AddResponseHeader=Expires, -1
 mq.host: 127.0.0.1       
+api.host: 127.0.0.1       
         
 logging.level.naf.cloud.gateway.*: DEBUG
 
@@ -36,6 +37,5 @@ spring:
       - AddResponseHeader=Pragma, no-cache
       - AddResponseHeader=Expires, -1
 mq.host: 192.168.1.190       
-
-
+api.host: 127.0.0.1
         

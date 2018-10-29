@@ -80,11 +80,15 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 				Claims claims = jws.getBody();
 				exchange.getAttributes().put(JWT_CLAIMS_ATTRIBUTE, claims);
 				log.debug("Jwt claims: {}", claims);
+				String subject = claims.getSubject();
+				String[] tokens = subject.split("@", 2);
+				String userid = tokens[0];
+				String tenant = tokens.length>1?tokens[1]:null;
 
 				ServerHttpRequest request = exchange.getRequest().mutate()
 						.headers(httpHeaders -> {
-							httpHeaders.set(HEADER_TENANT, claims.getIssuer());
-							httpHeaders.set(HEADER_USERID, claims.get("userid", String.class));
+							httpHeaders.set(HEADER_TENANT, tenant);
+							httpHeaders.set(HEADER_USERID, userid);
 							httpHeaders.set(HEADER_ROLE, claims.get("role", String.class));
 							@SuppressWarnings("unchecked")
 							ArrayList<String> tags = claims.get("tags", ArrayList.class);
