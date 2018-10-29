@@ -95,12 +95,12 @@ spring:
         - RewritePath=/www/api/naf/code/(?<segment>.*), /api/$\{segment}
       # == 框架接口-NAF分站接口服务 ==
       - id: naf_unit
-        uri: http://${api.host}:8002
+        uri: http://${api.host}:8001
         order: 9000
         predicates:
         - Path=/www/api/naf/unit/**
         filters:
-        - RewritePath=/www/api/naf/unit/(?<segment>.*), /api/$\{segment}
+        - RewritePath=/www/api/naf/unit/(?<segment>.*), /api/unit/$\{segment}
       # == 平台接口-学生库接口服务 ==
       - id: platform_user
         uri: http://${api.host}:8101
