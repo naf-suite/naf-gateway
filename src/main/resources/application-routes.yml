@@ -75,7 +75,7 @@ spring:
         - AddRequestHeader=X-Tenant, master
       # == 二级多租户平台管理前端 ==
       - id: master_platform_admin
-        uri: http://localhost:3100
+        uri: http://localhost:3200
         order: 10000
         predicates:
         - Host=*.smart.**
