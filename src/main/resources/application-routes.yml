@@ -102,7 +102,7 @@ spring:
         filters:
         - RewritePath=/www/api/naf/unit/(?<segment>.*), /api/unit/$\{segment}
       # == 平台接口-学生库接口服务 ==
-      - id: platform_user
+      - id: platform_user_api
         uri: http://${api.host}:8101
         order: 9000
         predicates:
@@ -110,7 +110,7 @@ spring:
         filters:
         - RewritePath=/www/api/user/(?<segment>.*), /api/$\{segment}
       # == 平台接口-企业库接口服务 ==
-      - id: platform_corp
+      - id: platform_corp_api
         uri: http://${api.host}:8102
         order: 9000
         predicates:
@@ -118,16 +118,16 @@ spring:
         filters:
         - RewritePath=/www/api/corp/(?<segment>.*), /api/$\{segment}
       # == 业务接口-招聘系统接口服务 ==
-      - id: platform_user
+      - id: platform_jobs_api
         uri: http://${api.host}:8201
         order: 9000
         predicates:
         - Path=/www/api/jobs/**
         filters:
         - RewritePath=/www/api/jobs/(?<segment>.*), /api/$\{segment}
-      # == 业务接口-微信端注册接口服务 ==
-      - id: weixin_mshp
-        uri: http://${api.host}:8202
+      # == 平台接口-微信端注册接口服务 ==
+      - id: platform_weixin_api
+        uri: http://${api.host}:8103
         order: 9000
         predicates:
         - Path=/www/api/weixin/**
