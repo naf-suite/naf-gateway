@@ -109,6 +109,7 @@ spring:
         - Path=/www/api/user/**
         filters:
         - RewritePath=/www/api/user/(?<segment>.*), /api/$\{segment}
+        - JwtParser
       # == 平台接口-企业库接口服务 ==
       - id: platform_corp_api
         uri: http://${api.host}:8102
@@ -117,6 +118,7 @@ spring:
         - Path=/www/api/corp/**
         filters:
         - RewritePath=/www/api/corp/(?<segment>.*), /api/$\{segment}
+        - JwtParser
       # == 业务接口-招聘系统接口服务 ==
       - id: platform_jobs_api
         uri: http://${api.host}:8201
@@ -125,6 +127,7 @@ spring:
         - Path=/www/api/jobs/**
         filters:
         - RewritePath=/www/api/jobs/(?<segment>.*), /api/$\{segment}
+        - JwtParser
       # == 平台接口-微信端注册接口服务 ==
       - id: platform_weixin_api
         uri: http://${api.host}:8103
@@ -133,4 +136,5 @@ spring:
         - Path=/www/api/weixin/**
         filters:
         - RewritePath=/www/api/weixin/(?<segment>.*), /$\{segment}
+        - JwtParser
         
