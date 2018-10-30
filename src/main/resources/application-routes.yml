@@ -125,4 +125,12 @@ spring:
         - Path=/www/api/jobs/**
         filters:
         - RewritePath=/www/api/jobs/(?<segment>.*), /api/$\{segment}
+      # == 业务接口-微信端注册接口服务 ==
+      - id: weixin_mshp
+        uri: http://${api.host}:8202
+        order: 9000
+        predicates:
+        - Path=/www/api/weixin/**
+        filters:
+        - RewritePath=/www/api/weixin/(?<segment>.*), /$\{segment}
         
