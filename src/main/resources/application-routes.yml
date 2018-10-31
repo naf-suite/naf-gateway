@@ -56,14 +56,24 @@ spring:
         - Path=/platform/api/naf/**
         filters:
         - RewritePath=/.*/api/naf/(?<segment>.*), /api/$\{segment}
-      # == 管理平台微信扫码登录 ==
-      - id: platform_weixin
+      # == 管理平台微信扫码登录（省级） ==
+      - id: platform_weixin_master
         uri: http://localhost:3300
         order: 9900
         predicates:
+        - Host=smart.**
         - Path=/platform/weixin/**
         filters:
         - AddRequestHeader=X-Tenant, master
+      # == 管理平台微信扫码登录（院校） ==
+      - id: platform_weixin_school
+        uri: http://localhost:3300
+        order: 9900
+        predicates:
+        - Host=*.smart.**
+        - Path=/platform/weixin/**
+        filters:
+        - HostToTenant=^([0-9]{5}).smart.*
       # == 省级平台管理前端 ==
       - id: master_platform_admin
         uri: http://localhost:3100
