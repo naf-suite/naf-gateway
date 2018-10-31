@@ -123,7 +123,7 @@ spring:
         - Path=/www/api/jobs/**
         filters:
         - RewritePath=/www/api/jobs/(?<segment>.*), /api/$\{segment}
-        - JwtParser
+        - JwtParser=.*(ticket/verify|jobfair/today|ticket/login)
       # == 平台接口-微信端注册接口服务 ==
       - id: platform_weixin_api
         uri: http://${api.host}:8103

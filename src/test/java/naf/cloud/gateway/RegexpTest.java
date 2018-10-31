@@ -30,6 +30,11 @@ public class RegexpTest {
 		} else {
 			System.out.println("Not Matched!");
 		}
+		
+		System.out.println();
+		String regx = ".*(ticket/verify|jobfair/today)";
+		System.out.println("/api/jobfair/today".matches(regx));
+		System.out.println("/api/jobfair/ticket/verify".matches(regx));
 	}
 
 }

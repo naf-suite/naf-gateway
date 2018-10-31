@@ -38,6 +38,7 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 	public static final String JWT_CLAIMS_ATTRIBUTE = "NafGateway.jwtClaims";
 
 	public static final String IGNORE_KEY = "ignore";
+	public static final String REQUIRED_KEY = "required";
 
 	@Value("${jwt.secret}")
 	private String secret;
@@ -48,7 +49,7 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 
 	@Override
 	public List<String> shortcutFieldOrder() {
-		return Arrays.asList(IGNORE_KEY);
+		return Arrays.asList(IGNORE_KEY, REQUIRED_KEY);
 	}
 
 	@Override
@@ -63,12 +64,14 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 			List<String> values = exchange.getRequest().getHeaders().get(HEADER_AUTH);
 			if (values == null || values.size() == 0) {
 				log.warn("Jwt token not found!");
-				exchange.getResponse().beforeCommit(() -> {
-					exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-					return Mono.empty();
-				});
-				return exchange.getResponse().setComplete();
-				//return chain.filter(exchange);
+				if(config.isRequired()) {
+					exchange.getResponse().beforeCommit(() -> {
+						exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+						return Mono.empty();
+					});
+					return exchange.getResponse().setComplete();
+				}
+				return chain.filter(exchange);
 			}
 			String token = values.get(0);
 			try {
@@ -113,6 +116,7 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 	public static class Config {
 		// @NotEmpty
 		private String ignore;
+		private boolean required = true;
 
 		public String getIgnore() {
 			return ignore;
@@ -120,6 +124,14 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 
 		public void setIgnore(String ignore) {
 			this.ignore = ignore;
+		}
+
+		public boolean isRequired() {
+			return required;
+		}
+
+		public void setRequired(boolean required) {
+			this.required = required;
 		}
 
 	}
