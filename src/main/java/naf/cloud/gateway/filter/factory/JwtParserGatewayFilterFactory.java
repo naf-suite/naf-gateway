@@ -19,6 +19,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.crypto.MacSigner;
 import io.jsonwebtoken.security.Keys;
@@ -61,6 +62,8 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 			if (config.getIgnore() != null && uri.getPath().matches(config.getIgnore())) {
 				return chain.filter(exchange.mutate().build());
 			}
+			String url = exchange.getRequest().getURI().toString();
+			String method = exchange.getRequest().getMethodValue();
 
 			List<String> values = exchange.getRequest().getHeaders().get(HEADER_AUTH);
 			if (values == null || values.size() == 0 || values.get(0) == null 
@@ -103,13 +106,19 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 						}).build();
 				return chain.filter(exchange.mutate().request(request).build());
 			} catch (ExpiredJwtException ex) {
-				log.warn("Jwt token expired");
-				exchange.getResponse().beforeCommit(() -> {
-					exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-					return Mono.empty();
-				});
-				return exchange.getResponse().setComplete();
+				log.warn("Jwt token expired [{} {}]", method, url);
+			} catch (MalformedJwtException ex) {
+				log.warn("Jwt token is invalid: MalformedJwtException [{} {}]", method, url);
+				if(log.isDebugEnabled()) {
+					log.debug(token);
+					ex.printStackTrace();
+				}
 			}
+			exchange.getResponse().beforeCommit(() -> {
+				exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+				return Mono.empty();
+			});
+			return exchange.getResponse().setComplete();
 		};
 
 	}
