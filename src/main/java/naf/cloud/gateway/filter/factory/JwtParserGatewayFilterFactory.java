@@ -92,7 +92,9 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 							httpHeaders.set(HEADER_ROLE, claims.get("role", String.class));
 							@SuppressWarnings("unchecked")
 							ArrayList<String> tags = claims.get("tags", ArrayList.class);
-							httpHeaders.set(HEADER_TAGS, String.join(",", tags));
+							if(tags != null) {
+								httpHeaders.set(HEADER_TAGS, String.join(",", tags));
+							}
 						}).build();
 				return chain.filter(exchange.mutate().request(request).build());
 			} catch (ExpiredJwtException ex) {
