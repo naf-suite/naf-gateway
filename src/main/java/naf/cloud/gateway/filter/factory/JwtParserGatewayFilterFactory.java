@@ -13,6 +13,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.util.StringUtils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -62,7 +63,8 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 			}
 
 			List<String> values = exchange.getRequest().getHeaders().get(HEADER_AUTH);
-			if (values == null || values.size() == 0) {
+			if (values == null || values.size() == 0 || values.get(0) == null 
+					|| StringUtils.isEmpty(values.get(0))) {
 				log.warn("Jwt token not found!");
 				if(config.isRequired()) {
 					exchange.getResponse().beforeCommit(() -> {
