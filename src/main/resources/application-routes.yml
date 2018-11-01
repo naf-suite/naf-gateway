@@ -56,6 +56,31 @@ spring:
         - Path=/platform/api/naf/**
         filters:
         - RewritePath=/.*/api/naf/(?<segment>.*), /api/$\{segment}
+      # == 管理接口-学生库服务（platform-user）==
+      - id: admin_api_user
+        uri: http://${api.host}:8101
+        order: 9000
+        predicates:
+        - Path=/platform/api/jobs/user/**
+        filters:
+        - RewritePath=/.*/api/jobs/user/(?<segment>.*), /admin/$\{segment}
+      # == 管理接口-企业库服务（platform-corp）==
+      - id: admin_api_corp
+        uri: http://${api.host}:8102
+        order: 9000
+        predicates:
+        - Path=/platform/api/jobs/corp/**
+        filters:
+        - RewritePath=/.*/api/jobs/corp/(?<segment>.*), /admin/$\{segment}
+      # == 管理接口-招聘相关接口服务（jobs-service）==
+      - id: admin_api_jobs
+        uri: http://${api.host}:8201
+        order: 9100
+        predicates:
+        - Path=/platform/api/jobs/**
+        filters:
+        - RewritePath=/.*/api/jobs/(?<segment>.*), /admin/$\{segment}
+        
       # == 管理平台微信扫码登录 ==
       - id: platform_weixin
         uri: http://localhost:3300
@@ -78,6 +103,8 @@ spring:
         predicates:
         - Host=*.smart.**
         - Path=/platform/**
+        
+        
       ##############################################
       #                  前端接口                                 #
       ##############################################        
