@@ -1,7 +1,6 @@
 package naf.cloud.gateway.filter.factory;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.URI_TEMPLATE_VARIABLES_ATTRIBUTE;
-import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.addOriginalRequestUrl;
 
 import java.net.URI;
 import java.util.Collections;
@@ -26,8 +25,6 @@ public class SetRequestHeaderExGatewayFilterFactory extends AbstractNameValueGat
 			UriTemplate uriTemplate = new UriTemplate(config.getValue());
 
 			PathMatchInfo variables = exchange.getAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-			ServerHttpRequest req = exchange.getRequest();
-			addOriginalRequestUrl(exchange, req.getURI());
 			Map<String, String> uriVariables;
 
 			if (variables != null) {

@@ -1,8 +1,20 @@
+
 ---
+server.port: 8000
+
 spring:
-  profiles: routes
+  profiles: platform
+  profiles.include: prod
   cloud:
     gateway:
+      default-filters:
+      #- PrefixPath=/httpbin
+      #- JwtParser=.*/login
+      - AddResponseHeader=Cache-Control, no-cache
+      - AddResponseHeader=Pragma, no-cache
+      - AddResponseHeader=Expires, -1
+      - HostToTenant=^([0-9]{5}).smart.*
+
       routes:
       # RabbitMQ Websocket route
       - id: websocket_route

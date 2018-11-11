@@ -1,0 +1,102 @@
+
+---
+server.port: 9000
+
+spring:
+  profiles: weixin
+  cloud:
+    gateway:
+      default-filters:
+      #- PrefixPath=/httpbin
+      #- JwtParser=.*/login
+      - AddResponseHeader=Cache-Control, no-cache
+      - AddResponseHeader=Pragma, no-cache
+      - AddResponseHeader=Expires, -1
+      
+      routes:
+      ##############################################
+      #                  微信前端接口                           #
+      ##############################################        
+      # == 框架接口-NAF字典接口服务 ==
+      - id: naf_code
+        uri: http://${api.host}:8002
+        order: 9000
+        predicates:
+        - Path=/weixin/api/naf/code/**
+        filters:
+        - RewritePath=/weixin/api/naf/code/(?<segment>.*), /api/$\{segment}
+      # == 框架接口-NAF分站接口服务 ==
+      - id: naf_unit
+        uri: http://${api.host}:8001
+        order: 9000
+        predicates:
+        - Path=/weixin/api/naf/unit/**
+        filters:
+        - RewritePath=/weixin/api/naf/unit/(?<segment>.*), /api/unit/$\{segment}
+      # == 平台接口-学生库接口服务 ==
+      - id: platform_user_api
+        uri: http://${api.host}:8101
+        order: 9000
+        predicates:
+        - Path=/weixin/api/user/**
+        filters:
+        - RewritePath=/weixin/api/user/(?<segment>.*), /api/$\{segment}
+        - JwtParser
+      # == 平台接口-企业库接口服务 ==
+      - id: platform_corp_api
+        uri: http://${api.host}:8102
+        order: 9000
+        predicates:
+        - Path=/weixin/api/corp/**
+        filters:
+        - RewritePath=/weixin/api/corp/(?<segment>.*), /api/$\{segment}
+        - JwtParser
+      # == 业务接口-招聘系统接口服务 ==
+      - id: platform_jobs_api
+        uri: http://${api.host}:8201
+        order: 9000
+        predicates:
+        - Path=/weixin/api/jobs/**
+        filters:
+        - RewritePath=/weixin/api/jobs/(?<segment>.*), /api/$\{segment}
+        - JwtParser=.*(ticket/verify|jobfair/today|ticket/login)
+      # == 平台接口-微信端注册接口服务 ==
+      - id: platform_weixin_api
+        uri: http://${api.host}:8103
+        order: 9000
+        predicates:
+        - Path=/weixin/api/mshp/**
+        filters:
+        - WeixinToken
+        - SetRequestParameter=openid, {wx:sub}
+        - RewritePath=/weixin/api/mshp/(?<segment>.*), /api/$\{segment}
+      # == 平台接口-微信端UI ==
+      - id: platform_weixin_ui
+        uri: http://${api.host}:9080
+        order: 9000
+        predicates:
+        - Path=/weixin/ui/**
+        filters:
+        - SetRequestParameter=openid, {wx:sub}
+        - name: WeixinToken
+          args:
+              redirect: /weixin/auth
+              ignore: .*(/auth)
+              order: -1
+      # == 平台接口-微信端认证服务 ==
+      - id: platform_weixin
+        uri: http://${api.host}:8103
+        order: 10000
+        predicates:
+        - Path=/weixin/**
+        filters:
+        - RewritePath=/weixin/(?<segment>.*), /$\{segment}
+        - SetRequestParameter=openid, {wx:sub}
+        - name: WeixinToken
+          args:
+              redirect: /weixin/auth
+              ignore: .*(/auth)
+              order: -1
+
+
+        

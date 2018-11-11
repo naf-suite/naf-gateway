@@ -1,7 +1,15 @@
 package naf.cloud.gateway;
 
+import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR;
+
+import java.net.URI;
+import java.util.LinkedHashSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -9,12 +17,16 @@ import org.springframework.core.annotation.Order;
 import naf.cloud.gateway.filter.factory.HostToTenantGatewayFilterFactory;
 import naf.cloud.gateway.filter.factory.JwtParserGatewayFilterFactory;
 import naf.cloud.gateway.filter.factory.SetRequestHeaderExGatewayFilterFactory;
+import naf.cloud.gateway.filter.factory.SetRequestParameterGatewayFilterFactory;
+import naf.cloud.gateway.filter.factory.WeixinTokenGatewayFilterFactory;
+import reactor.core.publisher.Mono;
 
 @SpringBootApplication
 @Configuration
 public class NafGatewayApplication {
 
-	
+	final static Logger log = LoggerFactory.getLogger(NafGatewayApplication.class);
+
 //	@Bean
 //	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 //		return builder.routes()
@@ -30,15 +42,36 @@ public class NafGatewayApplication {
 	}
 
 	@Bean
-	@Order(-1)
 	public JwtParserGatewayFilterFactory jwtParserGatewayFilterFactory() {
 		return new JwtParserGatewayFilterFactory();
 	}
 
 	@Bean
-	@Order(-2)
 	public HostToTenantGatewayFilterFactory hostToTenantGatewayFilterFactory() {
 		return new HostToTenantGatewayFilterFactory();
+	}
+
+	@Bean
+	public WeixinTokenGatewayFilterFactory weixinTokenGatewayFilterFactory() {
+		return new WeixinTokenGatewayFilterFactory();
+	}
+	
+	@Bean
+	public SetRequestParameterGatewayFilterFactory setRequestParameterGatewayFilterFactory() {
+		return new SetRequestParameterGatewayFilterFactory();
+	}
+
+	@Bean
+	@Order(-100)
+	public GlobalFilter testFilter() {
+	    return (exchange, chain) -> {
+	        log.debug("testFilter: {}", exchange.getRequest().getURI().toString());
+			LinkedHashSet<URI> originalUris = exchange.getAttribute(GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
+	        log.debug("originalUris: {}", originalUris);
+		
+
+	        return chain.filter(exchange).then(Mono.empty());
+	    };
 	}
 
 	public static void main(String[] args) {

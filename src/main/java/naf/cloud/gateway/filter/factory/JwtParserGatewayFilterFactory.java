@@ -66,19 +66,23 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 			String method = exchange.getRequest().getMethodValue();
 
 			List<String> values = exchange.getRequest().getHeaders().get(HEADER_AUTH);
-			if (values == null || values.size() == 0 || values.get(0) == null 
-					|| StringUtils.isEmpty(values.get(0))) {
+			String token = (values != null && values.size()> 0) ? values.get(0) : null;
+			if(token != null && token.startsWith("Bearer ")) {
+				token = token.substring(7);
+			}
+
+			if (token == null || StringUtils.isEmpty(token)
+					|| "null".equalsIgnoreCase(token) || "undefined".equalsIgnoreCase(token)) {
 				log.warn("Jwt token not found!");
 				if(config.isRequired()) {
 					exchange.getResponse().beforeCommit(() -> {
-						exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+						exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
 						return Mono.empty();
 					});
 					return exchange.getResponse().setComplete();
 				}
 				return chain.filter(exchange);
 			}
-			String token = values.get(0);
 			try {
 				byte[] key = Arrays.copyOf(secret.getBytes(), 32);
 				Jws<Claims> jws = Jwts.parser()
@@ -110,12 +114,12 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 			} catch (MalformedJwtException ex) {
 				log.warn("Jwt token is invalid: MalformedJwtException [{} {}]", method, url);
 				if(log.isDebugEnabled()) {
-					log.debug(token);
+					log.debug("token is: {}", token);
 					ex.printStackTrace();
 				}
 			}
 			exchange.getResponse().beforeCommit(() -> {
-				exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+				exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
 				return Mono.empty();
 			});
 			return exchange.getResponse().setComplete();

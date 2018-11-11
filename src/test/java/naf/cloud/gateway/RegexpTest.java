@@ -21,20 +21,29 @@ public class RegexpTest {
 		System.out.println(url.replaceAll("/(?<foo>.*)/(?<seg>.*)", "/${seg}/${foo}"));
 		System.out.println(url.replaceAll("/[^/]+/(?<seg>.*)", "/school/${seg}"));
 		System.out.println("/api/naf/login".matches(".*/login"));
-		
+
 		String host = "10183.smart.localhost";
 		Pattern p = Pattern.compile("^([0-9]+).smart.*");
 		Matcher m = p.matcher(host);
-		if(m.matches()) {
+		if (m.matches()) {
 			System.out.printf("Mateched: %s", m.group(1));
 		} else {
 			System.out.println("Not Matched!");
 		}
-		
+
 		System.out.println();
 		String regx = ".*(ticket/verify|jobfair/today)";
 		System.out.println("/api/jobfair/today".matches(regx));
 		System.out.println("/api/jobfair/ticket/verify".matches(regx));
+
+		regx = String.format("(?i)%s=([^&]*)", "openid");
+		System.out.println("foo=bar&openid=xxx&type=xx".replaceAll(regx, ""));
+
+		p = Pattern.compile("\\$\\{jwt:(.*)\\}");
+		m = p.matcher("${jwt:corpid}");
+		if (m.matches()) {
+			System.out.println(m.group(1));
+		}
 	}
 
 }
