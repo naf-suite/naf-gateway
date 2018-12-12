@@ -6,15 +6,13 @@ api.host: 127.0.0.1
 ---
 spring:
   profiles: local
-  profiles.include: routes
       
-mq.host: 192.168.18.100
+mq.host: 192.168.1.170
 logging.level.naf.cloud.gateway.*: DEBUG
 
 ---
 spring:
   profiles: dev
-  profiles.include: routes
       
 mq.host: 127.0.0.1
 logging.level.naf.cloud.gateway.*: DEBUG
@@ -43,7 +41,7 @@ spring:
 ---
 spring:
   profiles: platform-local
-  profiles.include: platform, dev
+  profiles.include: platform, local
   
 ---
 spring:

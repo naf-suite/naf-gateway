@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -28,21 +27,18 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.crypto.MacSigner;
-import io.jsonwebtoken.security.Keys;
 
 /**
- * @author dyg 微信认证Token过滤器
+ * 微信认证Token过滤器，通过Cookie读取认证Jwt
+ * @author dyg
  */
 public class WeixinTokenGatewayFilterFactory
-		extends AbstractGatewayFilterFactory<WeixinTokenGatewayFilterFactory.Config> {
+		extends AbstractGatewayFilterFactory<JwtParserGatewayFilterFactory.Config> {
 
 	final static Logger log = LoggerFactory.getLogger(WeixinTokenGatewayFilterFactory.class);
 
 	public static final String COOKIE_TOKEN = "wxtoken";
-	public static final String HEADER_OPENID = "X-Tags";
-	public static final String HEADER_ACCEPT = "X-Tags";
+	public static final String HEADER_OPENID = "X-OpenID";
 	public static final String WEIXIN_CLAIMS_ATTRIBUTE = "NafGateway.weixinClaims";
 
 	public static final String IGNORE_KEY = "ignore";
@@ -52,10 +48,8 @@ public class WeixinTokenGatewayFilterFactory
 	@Value("${jwt.secret}")
 	private String secret;
 	
-	private int order = -1;
-
 	public WeixinTokenGatewayFilterFactory() {
-		super(Config.class);
+		super(JwtParserGatewayFilterFactory.Config.class);
 	}
 
 	@Override
@@ -64,7 +58,7 @@ public class WeixinTokenGatewayFilterFactory
 	}
 
 	@Override
-	public GatewayFilter apply(Config config) {
+	public GatewayFilter apply(JwtParserGatewayFilterFactory.Config config) {
 		return new OrderedGatewayFilter((exchange, chain) -> {
 			// TODO: 检查是否忽略uri
 			URI uri = exchange.getRequest().getURI();
@@ -93,7 +87,6 @@ public class WeixinTokenGatewayFilterFactory
 
 			if (token != null) {
 				try {
-
 					byte[] key = Arrays.copyOf(secret.getBytes(), 32);
 					Jws<Claims> jws = Jwts.parser().setSigningKey(key).parseClaimsJws(token);
 
@@ -144,45 +137,8 @@ public class WeixinTokenGatewayFilterFactory
 			}
 			
 			return exchange.getResponse().setComplete();
-		}, this.order);
+		}, config.getOrder());
 
 	}
 
-	// @Validated
-	public static class Config {
-		// @NotEmpty
-		private String ignore;
-		// @NotEmpty
-		private String redirect;
-
-		public String getIgnore() {
-			return ignore;
-		}
-
-		public void setIgnore(String ignore) {
-			this.ignore = ignore;
-		}
-
-		public String getRedirect() {
-			return redirect;
-		}
-
-		public void setRedirect(String redirect) {
-			this.redirect = redirect;
-		}
-
-	}
-
-	public static void doInit() {
-		String secret = "Ziyouyanfa!@#";
-		byte[] key = Arrays.copyOf(secret.getBytes(), 32);
-		new MacSigner(SignatureAlgorithm.HS256, key); // 这个操作比较耗时
-
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.HOUR_OF_DAY, 1);
-		String signed = Jwts.builder().setIssuer("master").setSubject("platform").setExpiration(cal.getTime())
-				.claim("userid", "admin").claim("name", "管理员").signWith(Keys.hmacShaKeyFor(key)).compact();
-		Jwts.parser().setSigningKey(key).parseClaimsJws(signed);
-
-	}
 }

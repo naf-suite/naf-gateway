@@ -4,7 +4,6 @@ server.port: 8000
 
 spring:
   profiles: platform
-  profiles.include: prod
   cloud:
     gateway:
       default-filters:
@@ -42,7 +41,10 @@ spring:
         - Path=/platform/api/system/**
         filters:
         - RewritePath=/.*/api/system/(?<segment>.*), /$\{segment}
-        - JwtParser=.*/login
+        - name: JwtParser
+          args:
+              ignore: .*/login
+              order: -1
       # == 内部接口-微信扫码登录（naf_weixin）==
       - id: internal_weixin
         uri: http://${api.host}:8001
@@ -136,40 +138,3 @@ spring:
         - Path=/www/api/naf/unit/**
         filters:
         - RewritePath=/www/api/naf/unit/(?<segment>.*), /api/unit/$\{segment}
-      # == 平台接口-学生库接口服务 ==
-      - id: platform_user_api
-        uri: http://${api.host}:8101
-        order: 9000
-        predicates:
-        - Path=/www/api/user/**
-        filters:
-        - RewritePath=/www/api/user/(?<segment>.*), /api/$\{segment}
-        - JwtParser
-      # == 平台接口-企业库接口服务 ==
-      - id: platform_corp_api
-        uri: http://${api.host}:8102
-        order: 9000
-        predicates:
-        - Path=/www/api/corp/**
-        filters:
-        - RewritePath=/www/api/corp/(?<segment>.*), /api/$\{segment}
-        - JwtParser
-      # == 业务接口-招聘系统接口服务 ==
-      - id: platform_jobs_api
-        uri: http://${api.host}:8201
-        order: 9000
-        predicates:
-        - Path=/www/api/jobs/**
-        filters:
-        - RewritePath=/www/api/jobs/(?<segment>.*), /api/$\{segment}
-        - JwtParser=.*(ticket/verify|jobfair/today|ticket/login)
-      # == 平台接口-微信端注册接口服务 ==
-      - id: platform_weixin_api
-        uri: http://${api.host}:8103
-        order: 9000
-        predicates:
-        - Path=/www/api/weixin/**
-        filters:
-        - RewritePath=/www/api/weixin/(?<segment>.*), /$\{segment}
-        - JwtParser
-        

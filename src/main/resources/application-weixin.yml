@@ -59,7 +59,7 @@ spring:
         - Path=/weixin/api/jobs/**
         filters:
         - RewritePath=/weixin/api/jobs/(?<segment>.*), /api/$\{segment}
-        - JwtParser=.*(ticket/verify|jobfair/today|ticket/login)
+        - JwtParser=.*(ticket/verify|jobfair/today|ticket/login|corp/checkin)
       # == 平台接口-微信端注册接口服务 ==
       - id: platform_weixin_api
         uri: http://${api.host}:8103
@@ -91,12 +91,6 @@ spring:
         - Path=/weixin/**
         filters:
         - RewritePath=/weixin/(?<segment>.*), /$\{segment}
-        - SetRequestParameter=openid, {wx:sub}
-        - name: WeixinToken
-          args:
-              redirect: /weixin/auth
-              ignore: .*(/auth)
-              order: -1
 
 
         
