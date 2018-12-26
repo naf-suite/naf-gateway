@@ -94,6 +94,15 @@ spring:
         - Path=/platform/api/jobs/**
         filters:
         - RewritePath=/.*/api/jobs/(?<segment>.*), /admin/$\{segment}
+      # == 管理接口-公文系统相关接口服务（docflow-srv）==
+      - id: admin_api_docflow
+        uri: http://${api.host}:8301
+        order: 9000
+        predicates:
+        - Path=/platform/api/docflow/**
+        filters:
+        - RewritePath=/.*/api/docflow/(?<segment>.*), /$\{segment}
+        - JwtParser
         
       # == 管理平台微信扫码登录 ==
       - id: platform_weixin
@@ -101,22 +110,22 @@ spring:
         order: 9900
         predicates:
         - Path=/platform/weixin/**
-      # == 省级平台管理前端 ==
-      - id: master_platform_admin
-        uri: http://localhost:3100
-        order: 10000
-        predicates:
-        - Path=/platform/**
-        - Host=smart.**
-        filters:
-        - AddRequestHeader=X-Tenant, master
-      # == 二级多租户平台管理前端 ==
-      - id: master_platform_admin
-        uri: http://localhost:3200
-        order: 10000
-        predicates:
-        - Host=*.smart.**
-        - Path=/platform/**
+#      # == 省级平台管理前端 ==
+#      - id: master_platform_admin
+#        uri: http://localhost:3100
+#        order: 10000
+#        predicates:
+#        - Path=/platform/**
+#        - Host=smart.**
+#        filters:
+#        - AddRequestHeader=X-Tenant, master
+#      # == 二级多租户平台管理前端 ==
+#      - id: master_platform_admin
+#        uri: http://localhost:3200
+#        order: 10000
+#        predicates:
+#        - Host=*.smart.**
+#        - Path=/platform/**
         
         
       ##############################################
