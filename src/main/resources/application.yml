@@ -53,3 +53,18 @@ spring:
   profiles: platform-prod
   profiles.include: platform, prod
   
+---
+spring:
+  profiles: www-local
+  profiles.include: www, local
+  
+---
+spring:
+  profiles: www-dev
+  profiles.include: www, dev
+  
+---
+spring:
+  profiles: www-prod
+  profiles.include: www, prod
+    

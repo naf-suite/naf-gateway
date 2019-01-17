@@ -1,0 +1,85 @@
+
+---
+server.port: 9000
+
+spring:
+  profiles: www
+  cloud:
+    gateway:
+      default-filters:
+      #- PrefixPath=/httpbin
+      #- JwtParser=.*/login
+      - AddResponseHeader=Cache-Control, no-cache
+      - AddResponseHeader=Pragma, no-cache
+      - AddResponseHeader=Expires, -1
+      
+      routes:
+      ##############################################
+      #                  微信前端接口                           #
+      ##############################################        
+      # == 框架接口-NAF字典接口服务 ==
+      - id: naf_code
+        uri: http://${api.host}:8002
+        order: 9000
+        predicates:
+        - Path=/www/api/naf/code/**
+        filters:
+        - RewritePath=/www/api/naf/code/(?<segment>.*), /api/$\{segment}
+      # == 框架接口-NAF分站接口服务 ==
+      - id: naf_unit
+        uri: http://${api.host}:8001
+        order: 9000
+        predicates:
+        - Path=/www/api/naf/unit/**
+        filters:
+        - RewritePath=/www/api/naf/unit/(?<segment>.*), /api/unit/$\{segment}
+      # == 平台接口-学生库接口服务 ==
+      - id: platform_user_api
+        uri: http://${api.host}:8101
+        order: 9000
+        predicates:
+        - Path=/www/api/user/**
+        filters:
+        - RewritePath=/www/api/user/(?<segment>.*), /api/$\{segment}
+        - JwtParser
+      # == 平台接口-企业库接口服务 ==
+      - id: platform_corp_api
+        uri: http://${api.host}:8102
+        order: 9000
+        predicates:
+        - Path=/www/api/corp/**
+        filters:
+        - RewritePath=/www/api/corp/(?<segment>.*), /api/$\{segment}
+        - JwtParser
+      # == 业务接口-招聘系统查询服务 ==
+      - id: platform_jobs_api_get
+        uri: http://${api.host}:8201
+        order: 9000
+        predicates:
+        - Path=/www/api/jobs/**
+        - Method=GET
+        filters:
+        - RewritePath=/www/api/jobs/(?<segment>.*), /api/$\{segment}
+      # == 业务接口-招聘系统提交服务 ==
+      - id: platform_jobs_api_post
+        uri: http://${api.host}:8201
+        order: 9000
+        predicates:
+        - Path=/www/api/jobs/**
+        - Method=POST
+        filters:
+        - RewritePath=/www/api/jobs/(?<segment>.*), /api/$\{segment}
+        - JwtParser=.*(ticket/verify|jobfair/today|ticket/login|corp/checkin)
+      # == 平台接口-微信端注册接口服务 ==
+      - id: platform_weixin_api
+        uri: http://${api.host}:8103
+        order: 9000
+        predicates:
+        - Path=/www/api/mshp/**
+        filters:
+        - WeixinToken
+        - SetRequestParameter=openid, {wx:sub}
+        - RewritePath=/www/api/mshp/(?<segment>.*), /api/$\{segment}
+
+
+        
