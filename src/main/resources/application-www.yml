@@ -34,21 +34,41 @@ spring:
         - Path=/www/api/naf/unit/**
         filters:
         - RewritePath=/www/api/naf/unit/(?<segment>.*), /api/unit/$\{segment}
-      # == 平台接口-学生库接口服务 ==
-      - id: platform_user_api
+      # == 平台接口-学生库查询服务 ==
+      - id: platform_user_api_get
         uri: http://${api.host}:8101
         order: 9000
         predicates:
         - Path=/www/api/user/**
+        - Method=GET
+        filters:
+        - RewritePath=/www/api/user/(?<segment>.*), /api/$\{segment}
+      # == 平台接口-学生库注册服务 ==
+      - id: platform_user_api_post
+        uri: http://${api.host}:8101
+        order: 9000
+        predicates:
+        - Path=/www/api/user/**
+        - Method=POST
         filters:
         - RewritePath=/www/api/user/(?<segment>.*), /api/$\{segment}
         - JwtParser
-      # == 平台接口-企业库接口服务 ==
-      - id: platform_corp_api
+      # == 平台接口-企业库查询服务 ==
+      - id: platform_corp_api_get
         uri: http://${api.host}:8102
         order: 9000
         predicates:
         - Path=/www/api/corp/**
+        - Method=GET
+        filters:
+        - RewritePath=/www/api/corp/(?<segment>.*), /api/$\{segment}
+      # == 平台接口-企业库注册服务 ==
+      - id: platform_corp_api_post
+        uri: http://${api.host}:8102
+        order: 9000
+        predicates:
+        - Path=/www/api/corp/**
+        - Method=POST
         filters:
         - RewritePath=/www/api/corp/(?<segment>.*), /api/$\{segment}
         - JwtParser
