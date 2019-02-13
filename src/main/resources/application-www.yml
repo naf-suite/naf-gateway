@@ -101,6 +101,15 @@ spring:
         - WeixinToken
         - SetRequestParameter=openid, {wx:sub}
         - RewritePath=/www/api/mshp/(?<segment>.*), /api/$\{segment}
+      # == 平台接口-微信扫码登录接口 ==
+      - id: platform_weixin_qrcode_api
+        uri: http://${api.host}:8103
+        order: 9000
+        predicates:
+        - Path=/www/qrcode/**
+        - Method=POST
+        filters:
+        - RewritePath=/www/qrcode/(?<segment>.*), /qrcode/$\{segment}
 
 
         
