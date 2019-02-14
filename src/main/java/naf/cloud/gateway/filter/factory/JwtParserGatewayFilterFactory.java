@@ -118,9 +118,12 @@ public class JwtParserGatewayFilterFactory extends AbstractGatewayFilterFactory<
 					String tenant = tokens.length > 1 ? tokens[1] : null;
 
 					ServerHttpRequest request = exchange.getRequest().mutate().headers(httpHeaders -> {
-						httpHeaders.set(HEADER_TENANT, tenant);
-						httpHeaders.set(HEADER_USERID, subject);
-						httpHeaders.set(HEADER_ROLE, claims.get("role", String.class));
+						if(tenant != null) 
+							httpHeaders.set(HEADER_TENANT, tenant);
+						if(subject != null) 
+							httpHeaders.set(HEADER_USERID, subject);
+						if(claims.get("role", String.class) != null) 
+							httpHeaders.set(HEADER_ROLE, claims.get("role", String.class));
 						ArrayList<String> tags = claims.get("tags", ArrayList.class);
 						if (tags != null) {
 							httpHeaders.set(HEADER_TAGS, String.join(",", tags));

@@ -65,7 +65,8 @@ public class HostToTenantGatewayFilterFactory extends AbstractGatewayFilterFacto
 				String tenant = m.group(1);
 				ServerHttpRequest request = exchange.getRequest().mutate()
 						.headers(httpHeaders -> {
-							httpHeaders.set(HEADER_TENANT, tenant);
+							if(tenant != null)
+								httpHeaders.set(HEADER_TENANT, tenant);
 						}).build();
 				log.debug("Set X-Tenant use Host: {}", tenant);
 				return chain.filter(exchange.mutate().request(request).build());

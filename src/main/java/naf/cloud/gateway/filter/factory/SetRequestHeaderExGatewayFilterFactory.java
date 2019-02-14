@@ -37,8 +37,9 @@ public class SetRequestHeaderExGatewayFilterFactory extends AbstractNameValueGat
 			String newPath = uri.getRawPath();
 
 			ServerHttpRequest request = exchange.getRequest().mutate()
-					.headers(httpHeaders -> httpHeaders.set(config.getName(), newPath))
-					.build();
+					.headers(httpHeaders -> {
+						if(newPath != null) httpHeaders.set(config.getName(), newPath);
+					}).build();
 
 			return chain.filter(exchange.mutate().request(request).build());
 		};
