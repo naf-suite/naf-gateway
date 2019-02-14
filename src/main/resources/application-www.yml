@@ -106,10 +106,10 @@ spring:
         uri: http://${api.host}:8103
         order: 9000
         predicates:
-        - Path=/www/qrcode/**
+        - Path=/www/api/qrcode/**
         - Method=POST
         filters:
-        - RewritePath=/www/qrcode/(?<segment>.*), /qrcode/$\{segment}
+        - RewritePath=/www/api/qrcode/(?<segment>.*), /qrcode/$\{segment}
 
 
         
