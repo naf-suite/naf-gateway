@@ -6,8 +6,9 @@ api.host: 127.0.0.1
 ---
 spring:
   profiles: local
-      
-mq.host: 192.168.1.170
+  
+api.host: 192.168.18.100 #192.168.1.170   
+mq.host: 192.168.18.100 #192.168.1.170
 logging.level.naf.cloud.gateway.*: DEBUG
 
 ---

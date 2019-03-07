@@ -91,6 +91,15 @@ spring:
         filters:
         - RewritePath=/www/api/jobs/(?<segment>.*), /api/$\{segment}
         - JwtParser=.*(ticket/verify|jobfair/today|ticket/login|corp/checkin)
+      # == 业务接口-CMS系统查询服务 ==
+      - id: platform_cms_api_get
+        uri: http://${api.host}:8202
+        order: 9000
+        predicates:
+        - Path=/www/api/cms/**
+        - Method=GET
+        filters:
+        - RewritePath=/www/api/cms/(?<segment>.*), /api/$\{segment}
       # == 平台接口-微信端注册接口服务 ==
       - id: platform_weixin_api
         uri: http://${api.host}:8103

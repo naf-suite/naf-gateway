@@ -94,6 +94,15 @@ spring:
         - Path=/platform/api/jobs/**
         filters:
         - RewritePath=/.*/api/jobs/(?<segment>.*), /admin/$\{segment}
+      # == 管理接口-CMS系统相关接口服务（cms-service）==
+      - id: admin_api_cms
+        uri: http://${api.host}:8202
+        order: 9100
+        predicates:
+        - Path=/platform/api/cms/**
+        filters:
+        - RewritePath=/.*/api/cms/(?<segment>.*), /$\{segment}
+        - JwtParser
       # == 管理接口-公文系统相关接口服务（docflow-srv）==
       - id: admin_api_docflow
         uri: http://${api.host}:8301
@@ -103,7 +112,7 @@ spring:
         filters:
         - RewritePath=/.*/api/docflow/(?<segment>.*), /$\{segment}
         - JwtParser
-        
+
       # == 管理平台微信扫码登录 ==
       - id: platform_weixin
         uri: http://localhost:3300
