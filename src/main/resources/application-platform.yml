@@ -101,7 +101,7 @@ spring:
         predicates:
         - Path=/platform/api/cms/**
         filters:
-        - RewritePath=/.*/api/cms/(?<segment>.*), /$\{segment}
+        - RewritePath=/.*/api/cms/(?<segment>.*), /admin/$\{segment}
         - JwtParser
       # == 管理接口-公文系统相关接口服务（docflow-srv）==
       - id: admin_api_docflow
